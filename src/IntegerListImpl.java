@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public class IntegerListImpl implements StringList{
 
-    private final Integer[] items;
+    private Integer[] items;
     private int size;
 
 
@@ -16,7 +16,7 @@ public class IntegerListImpl implements StringList{
 
     @Override
     public Integer add(Integer item) {
-        validateSize();
+        growIfNeeded();
         validateItem(item);
         items[size++] = item;
         return item;
@@ -127,9 +127,9 @@ public class IntegerListImpl implements StringList{
             throw new NullItemException();
         }
     }
-    public void validateSize(){
+    public void growIfNeeded(){
         if(size == items.length){
-            throw new ItemsIsFullException();
+            grow();
         }
 
     }
@@ -138,6 +138,29 @@ public class IntegerListImpl implements StringList{
             throw new InvalidIndexException();
 
         }
+    }
+    public static void quickSort(Integer[] arr, int begin, int end) {
+        if (begin < end) {
+            int partitionIndex = partition(arr, begin, end);
+
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
+        }
+    }
+    private static int partition(Integer[] arr, int begin, int end) {
+        int pivot = arr[end];
+        int i = (begin - 1);
+
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElements(arr, i, j);
+            }
+        }
+
+        swapElements(arr, i + 1, end);
+        return i + 1;
     }
 
     private static void swapElements(Integer[] arr, int indexA, int indexB) {
@@ -155,15 +178,7 @@ public class IntegerListImpl implements StringList{
         }
     }
     public static void sortSelection(Integer[] arr) {
-        for (int i = 0; i < arr.length - 1; i++) {
-            int minElementIndex = i;
-            for (int j = i + 1; j < arr.length; j++) {
-                if (arr[j] < arr[minElementIndex]) {
-                    minElementIndex = j;
-                }
-            }
-            swapElements(arr, i, minElementIndex);
-        }
+        quickSort(arr, 0, arr.length - 1);
     }
     public static void sortInsertion(Integer[] arr) {
         for (int i = 0; i < arr.length; i++) {
@@ -199,5 +214,8 @@ public class IntegerListImpl implements StringList{
             }
         }
         return false;
+    }
+    private void grow() {
+        items = Arrays.copyOf(items, size + size / 2);
     }
 }
